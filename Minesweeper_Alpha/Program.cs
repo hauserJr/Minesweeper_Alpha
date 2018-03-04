@@ -23,21 +23,87 @@ namespace Minesweeper_Alpha
         List<NumberPosition> _NumberPosition = new List<NumberPosition>();
         List<SaveAreaPosition> _SaveAreaPosition = new List<SaveAreaPosition>();
 
+        List<CheckArea> _CheckArea = new List<CheckArea>();
         static void Main(string[] args)
         {
             Program _Program = new Program();
             _Program.GameInit();
 
             //Show
+            _Program.ShowCanvas();
+            string CheckArea = Console.ReadLine();
+            if (CheckArea.Equals("T"))
+            {
+                while (true)
+                {
+                    string CheckXY = Console.ReadLine();
+                    var x = CheckXY.Split(',')[0];
+                    var y = CheckXY.Split(',')[1];
+                    _Program.SeedFill(int.Parse(x), int.Parse(y));
+                    _Program.ShowCanvas();
+                    Console.ReadLine();
+                }
+            }
+            
+        }
+
+        public void ShowCanvas()
+        {
+            //Show
             for (int x = 0; x < Position_x; x++)
             {
                 for (int y = 0; y < Position_y; y++)
                 {
-                    Console.Write("  " + BoomsCanvas[x,y]);
+                    Console.Write("  " + BoomsCanvas[x, y]);
                 }
                 Console.Write("\n\r");
             }
-            Console.ReadLine();
+        }
+        public void SeedFill(int x, int y)
+        {
+            var Query = _SaveAreaPosition.Where(o => o.SaveArea_x == x && o.SaveArea_y == y).FirstOrDefault();
+            bool AnyQuery = _SaveAreaPosition.Where(o => o.SaveArea_x == x && o.SaveArea_y == y).Any();
+           
+
+            //Open         
+            if (AnyQuery)
+            {
+                AroundOpen( x, y);
+                SeedFill(x, y);
+                SeedFill(x - 1, y);
+                SeedFill(x + 1, y);
+                SeedFill(x, y - 1);
+                SeedFill(x, y + 1);
+            }
+        }
+
+        public void AroundOpen( int x, int y)
+        {
+            //這邊需要修正 上下左右判斷錯誤
+            bool top = _NumberPosition.Where(o => o.Number_x == x && o.Number_y == y + 1).Any();
+            bool down = _NumberPosition.Where(o => o.Number_x == x && o.Number_y == y - 1).Any();
+            bool left = _NumberPosition.Where(o => o.Number_x == x - 1 && o.Number_y == y).Any();
+            bool right = _NumberPosition.Where(o => o.Number_x == x + 1&& o.Number_y == y).Any();
+
+            //上下左右
+            if (top)
+            {
+                BoomsCanvas[x, y + 1] = "x";
+            }
+            if (down)
+            {
+                BoomsCanvas[x, y - 1] = "x";
+            }
+            if (left)
+            {
+                BoomsCanvas[x - 1, y] = "x";
+            }
+            if (right)
+            {
+                BoomsCanvas[x + 1, y] = "x";
+            }
+            var gg = _SaveAreaPosition.Where(o => o.SaveArea_x == x && o.SaveArea_y == y).FirstOrDefault();
+            _SaveAreaPosition.Remove(gg);
         }
 
         public void GameInit()
@@ -68,7 +134,6 @@ namespace Minesweeper_Alpha
                         {
                             Booms_x = BoomsPosition_x,
                             Booms_y = BoomsPosition_y
-
                         });
                         flag = false;
                     }
@@ -85,41 +150,41 @@ namespace Minesweeper_Alpha
                 //00 10 20
                 if ((_p.Booms_x - 1) >= 0 && (_p.Booms_y - 1) >= 0)
                 {
-                    BoomsCanvas[_p.Booms_x - 1, _p.Booms_y - 1] = BoomsAmount(BoomsCanvas[_p.Booms_x - 1, _p.Booms_y - 1]);
+                    BoomsCanvas[_p.Booms_x - 1, _p.Booms_y - 1] = BoomsAmount(_p.Booms_x - 1, _p.Booms_y - 1);
                 }
                 if ((_p.Booms_y - 1) >= 0)
                 {
-                    BoomsCanvas[_p.Booms_x, _p.Booms_y - 1] = BoomsAmount(BoomsCanvas[_p.Booms_x, _p.Booms_y - 1]);
+                    BoomsCanvas[_p.Booms_x, _p.Booms_y - 1] = BoomsAmount(_p.Booms_x, _p.Booms_y - 1);
                 }
                 if ((_p.Booms_x + 1) < Position_x && (_p.Booms_y - 1) >= 0)
                 {
-                    BoomsCanvas[_p.Booms_x + 1, _p.Booms_y - 1] = BoomsAmount(BoomsCanvas[_p.Booms_x + 1, _p.Booms_y - 1]);
+                    BoomsCanvas[_p.Booms_x + 1, _p.Booms_y - 1] = BoomsAmount(_p.Booms_x + 1, _p.Booms_y - 1);
                 }
 
                 //1,1
                 //01 21
                 if ((_p.Booms_x - 1) >= 0)
                 {
-                    BoomsCanvas[_p.Booms_x - 1, _p.Booms_y] = BoomsAmount(BoomsCanvas[_p.Booms_x - 1, _p.Booms_y]);
+                    BoomsCanvas[_p.Booms_x - 1, _p.Booms_y] = BoomsAmount(_p.Booms_x - 1, _p.Booms_y);
                 }
                 if ((_p.Booms_x + 1) < Position_x)
                 {
-                    BoomsCanvas[_p.Booms_x + 1, _p.Booms_y] = BoomsAmount(BoomsCanvas[_p.Booms_x +1, _p.Booms_y]);
+                    BoomsCanvas[_p.Booms_x + 1, _p.Booms_y] = BoomsAmount(_p.Booms_x +1, _p.Booms_y);
                 }
 
                 //1,1
                 //02 12 22
                 if ((_p.Booms_x - 1) >= 0 && (_p.Booms_y + 1) < Position_y)
                 {
-                    BoomsCanvas[_p.Booms_x - 1, _p.Booms_y + 1] = BoomsAmount(BoomsCanvas[_p.Booms_x - 1, _p.Booms_y + 1]);
+                    BoomsCanvas[_p.Booms_x - 1, _p.Booms_y + 1] = BoomsAmount(_p.Booms_x - 1, _p.Booms_y + 1);
                 }
                 if ((_p.Booms_y + 1) < Position_y)
                 {
-                    BoomsCanvas[_p.Booms_x, _p.Booms_y + 1] = BoomsAmount(BoomsCanvas[_p.Booms_x, _p.Booms_y + 1]);
+                    BoomsCanvas[_p.Booms_x, _p.Booms_y + 1] = BoomsAmount(_p.Booms_x, _p.Booms_y + 1);
                 }
                 if ((_p.Booms_x + 1) < Position_x && (_p.Booms_y + 1) < Position_y)
                 {
-                    BoomsCanvas[_p.Booms_x + 1, _p.Booms_y + 1] = BoomsAmount(BoomsCanvas[_p.Booms_x + 1, _p.Booms_y + 1]);
+                    BoomsCanvas[_p.Booms_x + 1, _p.Booms_y + 1] = BoomsAmount(_p.Booms_x + 1, _p.Booms_y + 1);
                 }
             }
             #endregion
@@ -133,23 +198,34 @@ namespace Minesweeper_Alpha
                     if (string.IsNullOrEmpty(BoomsCanvas[x,y]))
                     {
                         BoomsCanvas[x, y] = string.Format("-");
+                        _SaveAreaPosition.Add(new SaveAreaPosition()
+                        {
+                            SaveArea_x = x,
+                            SaveArea_y = y
+                        });
                     }
                 }
             }
         }
 
         //提示炸彈數量確認
-        public string BoomsAmount(string BoomsPosition)
+        public string BoomsAmount(int BoomX, int BoomY)
         {
+            string BoomsPosition = BoomsCanvas[BoomX, BoomY];
             if (string.IsNullOrEmpty(BoomsPosition))
             {
+                _NumberPosition.Add(new NumberPosition()
+                {
+                    Number_x = BoomX,
+                    Number_y = BoomY
+                });
                 return "1";
             }
             if (BoomsPosition.Equals("*"))
             {
                 return "*";
             }
-            return (int.Parse(BoomsPosition) + 1).ToString() ;
+            return (int.Parse(BoomsPosition) + 1).ToString();
         }
 
         public class BoomsPosition
@@ -171,6 +247,12 @@ namespace Minesweeper_Alpha
             public int SaveArea_x { get; set; }
 
             public int SaveArea_y { get; set; }
+        }
+        public class CheckArea
+        {
+            public int CheckArea_x { get; set; }
+
+            public int CheckArea_y { get; set; }
         }
     }
 }
