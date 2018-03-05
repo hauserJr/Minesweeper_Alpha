@@ -63,12 +63,12 @@ namespace Minesweeper_Alpha
         {
             var Query = _SaveAreaPosition.Where(o => o.SaveArea_x == x && o.SaveArea_y == y).FirstOrDefault();
             bool AnyQuery = _SaveAreaPosition.Where(o => o.SaveArea_x == x && o.SaveArea_y == y).Any();
-           
+            _SaveAreaPosition.Remove(Query);
 
             //Open         
             if (AnyQuery)
             {
-                AroundOpen( x, y);
+                AroundOpen(x, y);
                 SeedFill(x, y);
                 SeedFill(x - 1, y);
                 SeedFill(x + 1, y);
@@ -79,31 +79,60 @@ namespace Minesweeper_Alpha
 
         public void AroundOpen( int x, int y)
         {
-            //這邊需要修正 上下左右判斷錯誤
-            bool top = _NumberPosition.Where(o => o.Number_x == x && o.Number_y == y + 1).Any();
-            bool down = _NumberPosition.Where(o => o.Number_x == x && o.Number_y == y - 1).Any();
-            bool left = _NumberPosition.Where(o => o.Number_x == x - 1 && o.Number_y == y).Any();
-            bool right = _NumberPosition.Where(o => o.Number_x == x + 1&& o.Number_y == y).Any();
+            //上下左右
+            var top = _NumberPosition.Where(o => o.Number_x == x - 1 && o.Number_y == y);
+            var down = _NumberPosition.Where(o => o.Number_x == x + 1 && o.Number_y == y);
+            var left = _NumberPosition.Where(o => o.Number_x == x && o.Number_y == y - 1);
+            var right = _NumberPosition.Where(o => o.Number_x == x && o.Number_y == y + 1);
+
+            //左上 左下 右上 右下
+            var tl = _NumberPosition.Where(o => o.Number_x == x - 1 && o.Number_y == y - 1);
+            var tr = _NumberPosition.Where(o => o.Number_x == x + 1 && o.Number_y == y - 1);
+            var dl = _NumberPosition.Where(o => o.Number_x == x - 1 && o.Number_y == y + 1);
+            var dr = _NumberPosition.Where(o => o.Number_x == x + 1 && o.Number_y == y + 1);
 
             //上下左右
-            if (top)
-            {
-                BoomsCanvas[x, y + 1] = "x";
-            }
-            if (down)
-            {
-                BoomsCanvas[x, y - 1] = "x";
-            }
-            if (left)
+            if (top.Any())
             {
                 BoomsCanvas[x - 1, y] = "x";
+                _NumberPosition.Remove(top.FirstOrDefault());
             }
-            if (right)
+            if (down.Any())
             {
                 BoomsCanvas[x + 1, y] = "x";
+                _NumberPosition.Remove(down.FirstOrDefault());
             }
-            var gg = _SaveAreaPosition.Where(o => o.SaveArea_x == x && o.SaveArea_y == y).FirstOrDefault();
-            _SaveAreaPosition.Remove(gg);
+            if (left.Any())
+            {
+                BoomsCanvas[x, y - 1] = "x";
+                _NumberPosition.Remove(left.FirstOrDefault());
+            }
+            if (right.Any())
+            {
+                BoomsCanvas[x, y + 1] = "x";
+                _NumberPosition.Remove(right.FirstOrDefault());
+            }
+
+            if (tl.Any())
+            {
+                BoomsCanvas[x - 1, y - 1] = "x";
+                _NumberPosition.Remove(tl.FirstOrDefault());
+            }
+            if (tr.Any())
+            {
+                BoomsCanvas[x + 1, y - 1] = "x";
+                _NumberPosition.Remove(tr.FirstOrDefault());
+            }
+            if (dl.Any())
+            {
+                BoomsCanvas[x - 1, y + 1] = "x";
+                _NumberPosition.Remove(dl.FirstOrDefault());
+            }
+            if (dr.Any())
+            {
+                BoomsCanvas[x + 1, y + 1] = "x";
+                _NumberPosition.Remove(dr.FirstOrDefault());
+            }
         }
 
         public void GameInit()
