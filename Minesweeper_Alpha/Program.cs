@@ -127,11 +127,17 @@ namespace Minesweeper_Alpha
             var left = _MinesweeperConfig._NumberPosition.Where(o => o.Number_x == x && o.Number_y == y - 1);
             var right = _MinesweeperConfig._NumberPosition.Where(o => o.Number_x == x && o.Number_y == y + 1);
 
-            //左上 左下 右上 右下
-            var tl = _MinesweeperConfig._NumberPosition.Where(o => o.Number_x == x - 1 && o.Number_y == y - 1);
-            var tr = _MinesweeperConfig._NumberPosition.Where(o => o.Number_x == x + 1 && o.Number_y == y - 1);
-            var dl = _MinesweeperConfig._NumberPosition.Where(o => o.Number_x == x - 1 && o.Number_y == y + 1);
-            var dr = _MinesweeperConfig._NumberPosition.Where(o => o.Number_x == x + 1 && o.Number_y == y + 1);
+            //數字左上 左下 右上 右下
+            var tlNum = _MinesweeperConfig._NumberPosition.Where(o => o.Number_x == x - 1 && o.Number_y == y - 1);
+            var trNum = _MinesweeperConfig._NumberPosition.Where(o => o.Number_x == x + 1 && o.Number_y == y - 1);
+            var dlNum = _MinesweeperConfig._NumberPosition.Where(o => o.Number_x == x - 1 && o.Number_y == y + 1);
+            var drNum = _MinesweeperConfig._NumberPosition.Where(o => o.Number_x == x + 1 && o.Number_y == y + 1);
+
+            //炸彈
+            var tlSaveArea = _MinesweeperConfig._SaveAreaPosition.Where(o => o.SaveArea_x == x - 1 && o.SaveArea_y == y - 1);
+            var trSaveArea = _MinesweeperConfig._SaveAreaPosition.Where(o => o.SaveArea_x == x + 1 && o.SaveArea_y == y - 1);
+            var dlSaveArea = _MinesweeperConfig._SaveAreaPosition.Where(o => o.SaveArea_x == x - 1 && o.SaveArea_y == y + 1);
+            var drSaveArea = _MinesweeperConfig._SaveAreaPosition.Where(o => o.SaveArea_x == x + 1 && o.SaveArea_y == y + 1);
 
             //上下左右
             if (top.Any())
@@ -155,28 +161,50 @@ namespace Minesweeper_Alpha
                 _MinesweeperConfig._NumberPosition.Remove(right.FirstOrDefault());
             }
 
-            if (tl.Any())
+            //數字左上 左下 右上 右下
+            if (tlNum.Any())
             {
                 BoomsCanvas[x - 1, y - 1] = "x";
-                _MinesweeperConfig._NumberPosition.Remove(tl.FirstOrDefault());
+                _MinesweeperConfig._NumberPosition.Remove(tlNum.FirstOrDefault());
             }      
 
-            if (tr.Any())
+            if (trNum.Any())
             {
                 BoomsCanvas[x + 1, y - 1] = "x";
-                _MinesweeperConfig._NumberPosition.Remove(tr.FirstOrDefault());
+                _MinesweeperConfig._NumberPosition.Remove(trNum.FirstOrDefault());
             }
 
-            if (dl.Any())
+            if (dlNum.Any())
             {
                 BoomsCanvas[x - 1, y + 1] = "x";
-                _MinesweeperConfig._NumberPosition.Remove(dl.FirstOrDefault());
+                _MinesweeperConfig._NumberPosition.Remove(dlNum.FirstOrDefault());
             }
 
-            if (dr.Any())
+            if (drNum.Any())
             {
                 BoomsCanvas[x + 1, y + 1] = "x";
-                _MinesweeperConfig._NumberPosition.Remove(dr.FirstOrDefault());
+                _MinesweeperConfig._NumberPosition.Remove(drNum.FirstOrDefault());
+            }
+
+            //安全區左上 左下 右上 右下
+            if (tlSaveArea.Any())
+            {
+                SeedFill(x - 1, y - 1);
+            }
+
+            if (trSaveArea.Any())
+            {
+                SeedFill(x + 1, y - 1);
+            }
+
+            if (dlSaveArea.Any())
+            {
+                SeedFill(x - 1, y + 1);
+            }
+
+            if (drSaveArea.Any())
+            {
+                SeedFill(x + 1, y + 1);
             }
         }
 
