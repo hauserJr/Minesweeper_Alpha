@@ -18,9 +18,8 @@ namespace Minesweeper_Alpha
         //畫面
         static string[,] BoomsCanvas = new string[Position_x, Position_y];
 
-        //炸彈位置
+        //存放各格子資訊
         MinesweeperConfig _MinesweeperConfig;
-
 
         static void Main(string[] args)
         {
